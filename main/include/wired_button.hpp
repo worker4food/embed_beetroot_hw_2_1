@@ -36,13 +36,13 @@ class WiredButton {
 
         Event check_event(int new_level, int64_t current_us) {
             if (unstable_level != new_level) {
- 
+
                 unstable_level = new_level;
                 switched_at_us = current_us;
 
                 return Event::None;
             } else if (debounce_delay_us < (current_us - switched_at_us) && new_level != level) {
- 
+
                 switched_at_us = current_us;
                 level = new_level;
                 unstable_level = new_level;
