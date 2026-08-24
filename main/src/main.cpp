@@ -10,6 +10,9 @@
 #include "wired_led.hpp"
 #include "wired_button.hpp"
 
+// gpio02 -- [ 220 Ohm ] -- [A(+) LED2 K(-)] -- GND
+// gpio47 -- [ _/  BTN ] -- GND
+
 volatile int button_state = 0;
 
 void IRAM_ATTR on_button(void *) {
@@ -34,6 +37,11 @@ void app_main() {
 
     esp_task_wdt_deinit(); // superloop
 
+    int64_t iters = 0;
+    int64_t start_us;
+    constexpr auto max_iterations = 100000u;
+
+    start_us = esp_timer_get_time();
     for(;;) {
         auto current_us = esp_timer_get_time();
 
@@ -43,6 +51,14 @@ void app_main() {
         }
 
         led.loop(current_us);
+
+        if (++iters >= max_iterations) {
+            double iter_time_us = (current_us - start_us + 0.0)/iters;
+            ESP_LOGI(__func__, "avg iteration time over %lld iterations: %f µs", iters, iter_time_us);
+
+            start_us = current_us;
+            iters = 0;
+        }
     }
 }
 
