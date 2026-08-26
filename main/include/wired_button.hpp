@@ -5,17 +5,17 @@
 class WiredButton {
     protected:
         int level, unstable_level = -1;
-        int64_t switched_at_us = -1;
+        std::int64_t switched_at_us = -1;
     public:
         const gpio_num_t pin;
-        const uint32_t pressed_level;
-        const uint64_t debounce_delay_us;
+        const std::uint32_t pressed_level;
+        const std::uint64_t debounce_delay_us;
 
         enum class Event {
             Pressed, Released, None
         };
 
-        WiredButton(gpio_num_t gpio_pin, uint32_t pressed_lvl, int64_t debounce_interval_us)
+        WiredButton(gpio_num_t gpio_pin, std::uint32_t pressed_lvl, std::int64_t debounce_interval_us)
             :pin(gpio_pin), pressed_level(pressed_lvl), debounce_delay_us(debounce_interval_us)
         {
             level = -1;
@@ -34,7 +34,7 @@ class WiredButton {
             return gpio_config(&b);
         }
 
-        Event check_event(int new_level, int64_t current_us) {
+        Event check_event(int new_level, std::int64_t current_us) {
             if (unstable_level != new_level) {
 
                 unstable_level = new_level;

@@ -35,29 +35,29 @@ void app_main() {
     ESP_RETURN_VOID_ON_ERROR(btn.init(),  __func__, "pushbutton (%d) init error", Cfg::ButtonPin);
     ESP_RETURN_VOID_ON_ERROR(setup_isr_handler(), __func__, "setup_isr_handler error");
 
-    esp_task_wdt_deinit(); // superloop
+    ESP_RETURN_VOID_ON_ERROR(esp_task_wdt_deinit(), __func__, "watchdog timer deactivation failed"); // superloop
 
-    int64_t iters = 0;
     int64_t start_us;
     constexpr auto max_iterations = 100000u;
 
     start_us = esp_timer_get_time();
-    for(;;) {
+    for(auto i = 1;;i++) {
         auto current_us = esp_timer_get_time();
 
         if (btn.check_event(button_state, current_us) == WiredButton::Event::Released) {
             auto next = led.switch_state();
-            ESP_LOGI(__func__, "Led state: %d", next);
+            ESP_LOGI(__func__, "led state: %d", next);
         }
 
         led.loop(current_us);
 
-        if (++iters >= max_iterations) {
-            double iter_time_us = (current_us - start_us + 0.0)/iters;
-            ESP_LOGI(__func__, "avg iteration time over %lld iterations: %f µs", iters, iter_time_us);
+        if (i >= max_iterations) {
+            double iter_time_us = (current_us - start_us + 0.0)/i;
+
+            ESP_LOGI(__func__, "avg iteration time over %d iterations: %f µs", i, iter_time_us);
 
             start_us = current_us;
-            iters = 0;
+            i = 1;
         }
     }
 }

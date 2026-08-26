@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <esp_check.h>
 #include <driver/gpio.h>
 
@@ -7,18 +8,18 @@ enum class Led {
     Off = 0, On = 1, Blink = 2
 };
 
-constexpr uint8_t TotalStates = 3;
+constexpr std::uint8_t TotalStates = 3;
 
 class WiredLed {
     protected:
         Led state;
-        int64_t last_toggle_us = 0;
+        std::int64_t last_toggle_us = 0;
 
     public:
         const gpio_num_t pin;
-        const int64_t blink_delay_us;
+        const std::int64_t blink_delay_us;
 
-        WiredLed(gpio_num_t gpio_pin, int64_t blink_delay_us): pin(gpio_pin), blink_delay_us(blink_delay_us) {}
+        WiredLed(gpio_num_t gpio_pin, std::int64_t blink_delay_us): pin(gpio_pin), blink_delay_us(blink_delay_us) {}
 
         esp_err_t init(Led s = Led::Off) {
             state = s;
@@ -28,7 +29,7 @@ class WiredLed {
             return gpio_set_direction(pin, GPIO_MODE_INPUT_OUTPUT);
         }
 
-        esp_err_t loop(int64_t current_us) {
+        esp_err_t loop(std::int64_t current_us) {
             auto current = gpio_get_level(pin);
             esp_err_t res = ESP_OK;
 
@@ -45,7 +46,7 @@ class WiredLed {
         }
 
         Led switch_state() {
-            auto next = (static_cast<int8_t>(state) + 1) % TotalStates;
+            auto next = (static_cast<std::int8_t>(state) + 1) % TotalStates;
             state = static_cast<Led>(next);
 
             return state;
